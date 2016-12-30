@@ -18,17 +18,20 @@
             <AppBarButton Icon="Refresh" Label="Check for Updates" IsEnabled="{Binding GlobalInterfaceAvailable}"/>
         </CommandBar>
     </Page.TopAppBar>
-    <StackPanel Margin="12 12 12 12">
-        <Pivot x:Name="rootPivot">
-            <PivotItem Margin="0 0 0 0">
+    <Grid  Margin="0 0 0 0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Pivot Grid.Row="0"  x:Name="rootPivot">
+            <PivotItem Margin="0 0 0 0" Padding="0 0 0 0">
                 <PivotItem.Header>
-                    <local:TabHeader Header="Selected Mods"/>
+                    <local:TabHeader Header="Selected Mods" Foreground="{StaticResource Yellow}" FontWeight="Bold"/>
                 </PivotItem.Header>
                 <xaml:SelectedModsView x:Name="SelectedModsView"/>
             </PivotItem>
             <PivotItem Margin="0 0 0 0">
                 <PivotItem.Header>
-                    <local:TabHeader Header="Available Mods"/>
+                    <local:TabHeader Header="Available Mods" Foreground="{StaticResource Yellow}" FontWeight="Bold"/>
                 </PivotItem.Header>
                 <view:AvailableModsView x:Name="AvailableModsView"/>
             </PivotItem>
@@ -38,5 +41,5 @@
             </PivotItem>
             -->
         </Pivot>
-    </StackPanel>
+    </Grid>
 </Page>

@@ -18,7 +18,8 @@ namespace WoWS_Mod_Manager.Control.Data
         public string license { get; set; }
         public string description { get; set; }
         public string home { get; set; }
-        public bool eligible { get; set; } = false;
+        public string category { get; set; } = "None";
+        public string website { get; set; }
 
         override public string ToString()
         {

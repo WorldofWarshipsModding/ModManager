@@ -36,6 +36,28 @@ namespace WoWS_Mod_Manager.ViewModel
             }
         }
 
+        public string Category
+        {
+            get { return _Model.category; }
+            set
+            {
+                if (_Model.category == value) return;
+                _Model.category = value;
+                OnPropertyChanged("Category");
+            }
+        }
+
+        public string Website
+        {
+            get { return _Model.website; }
+            set
+            {
+                if (_Model.website == value) return;
+                _Model.website = value;
+                OnPropertyChanged("Website");
+            }
+        }
+
         override public String ToString()
         {
             return Name;
