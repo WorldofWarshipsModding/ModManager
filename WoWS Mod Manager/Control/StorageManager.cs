@@ -51,14 +51,17 @@ namespace WoWS_Mod_Manager.Control
                 folderPicker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.Desktop;
                 folderPicker.FileTypeFilter.Add(".exe"); /* api bug circumvention */
                 StorageFolder folder = await folderPicker.PickSingleFolderAsync();
-                Windows.Storage.AccessCache.StorageApplicationPermissions.FutureAccessList.AddOrReplace(wowsFolderSetting, folder); /* save permission */
-                if (folder != null && await Task.Run(() => IsWoWSLocationValid(folder.Path)))
+                if (folder != null) 
                 {
-                    absoluteWoWSPath = folder.Path;
-                    storedSettings.Values[wowsFolderSetting] = folder.Path;
-                    Debug.WriteLine("Picked folder: " + folder.Name);
-                    locationValid = true;
-                    //TODO inform UI
+                    Windows.Storage.AccessCache.StorageApplicationPermissions.FutureAccessList.AddOrReplace(wowsFolderSetting, folder); /* save permission */
+                    if (await Task.Run(() => IsWoWSLocationValid(folder.Path)))
+                    {
+                        absoluteWoWSPath = folder.Path;
+                        storedSettings.Values[wowsFolderSetting] = folder.Path;
+                        Debug.WriteLine("Picked folder: " + folder.Name);
+                        locationValid = true;
+                        //TODO inform UI
+                    }
                 }
                 else
                 {
@@ -78,9 +81,10 @@ namespace WoWS_Mod_Manager.Control
             Debug.WriteLine("IsWoWSLocationValid " + location);
             try
             {
-                if (File.Exists(location + @"\WoWSLauncher.cfg"))
+                String LauncherConfig = location + @"\WoWSLauncher.cfg";
+                if (File.Exists(LauncherConfig))
                     return true;
-                Debug.WriteLine("no WoWSLauncher.cfg found at " + location);
+                Debug.WriteLine("File.Exists returned false for " + LauncherConfig);
                 return false;
             }
             catch (Exception e)
