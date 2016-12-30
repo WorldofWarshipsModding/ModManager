@@ -1,0 +1,2 @@
+MainPackage=C:\Users\Benni\Documents\Visual Studio 2017\Projects\WoWS Mod Manager\WoWS Mod Manager\bin\x64\Release\WoWS Mod Manager_1.1.3.0_x64.appx
+SymbolPackage=C:\Users\Benni\Documents\Visual Studio 2017\Projects\WoWS Mod Manager\WoWS Mod Manager\AppPackages\WoWS Mod Manager_1.1.3.0_Test\WoWS Mod Manager_1.1.3.0_x64.appxsym
