@@ -22670,20 +22670,17 @@
   },
   "project": {
     "restore": {
-      "projectUniqueName": "C:\\Users\\Benni\\Documents\\Visual Studio 2017\\Projects\\WoWS Mod Manager\\WoWS Mod Manager\\WoWS Mod Manager.csproj",
+      "projectUniqueName": "C:\\Users\\Benni\\repositories\\ModManager\\WoWS Mod Manager\\WoWS Mod Manager.csproj",
       "projectName": "WoWS Mod Manager",
-      "projectPath": "C:\\Users\\Benni\\Documents\\Visual Studio 2017\\Projects\\WoWS Mod Manager\\WoWS Mod Manager\\WoWS Mod Manager.csproj",
-      "projectJsonPath": "C:\\Users\\Benni\\Documents\\Visual Studio 2017\\Projects\\WoWS Mod Manager\\WoWS Mod Manager\\project.json",
+      "projectPath": "C:\\Users\\Benni\\repositories\\ModManager\\WoWS Mod Manager\\WoWS Mod Manager.csproj",
+      "projectJsonPath": "C:\\Users\\Benni\\repositories\\ModManager\\WoWS Mod Manager\\project.json",
       "outputType": "UAP"
     },
     "dependencies": {
       "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2",
+      "MyToolkit.Extended": "2.5.16",
       "Newtonsoft.Json": "9.0.1",
-      "System.Xml.XmlDocument": "4.3.0",
-      "MyToolkit.Extended": {
-        "target": "Package",
-        "version": "[2.5.16, )"
-      }
+      "System.Xml.XmlDocument": "4.3.0"
     },
     "frameworks": {
       "uap10.0": {}
