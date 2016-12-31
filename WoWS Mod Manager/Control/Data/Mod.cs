@@ -20,7 +20,8 @@ namespace WoWS_Mod_Manager.Control.Data
         public string home { get; set; }
         public string category { get; set; } = "None";
         public string website { get; set; }
-
+        public string author { get; set; }
+        public string screenshot { get; set; }
         override public string ToString()
         {
             return name + " ("+identifier+")";

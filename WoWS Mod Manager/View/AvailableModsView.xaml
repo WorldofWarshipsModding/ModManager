@@ -32,12 +32,17 @@
                             </DataTemplate>
                         </controls:DataGridTemplatedColumn.CellTemplate>
                     </controls:DataGridTemplatedColumn>
-                    <controls:DataGridTextColumn Width="*" Binding="{Binding Name}">
+                    <controls:DataGridTextColumn Width="4*" Binding="{Binding Name}">
                         <controls:DataGridTextColumn.Header>
                             <TextBlock Text="Name" Foreground="{StaticResource Green}" FontWeight="Bold"/>
                         </controls:DataGridTextColumn.Header>
                     </controls:DataGridTextColumn>
-                    <controls:DataGridTextColumn Width="Auto" Binding="{Binding Category}">
+                    <controls:DataGridTextColumn Width="*" Binding="{Binding Author}">
+                        <controls:DataGridTextColumn.Header>
+                            <TextBlock Text="Author" Foreground="{StaticResource Green}" FontWeight="Bold"/>
+                        </controls:DataGridTextColumn.Header>
+                    </controls:DataGridTextColumn>
+                    <controls:DataGridTextColumn Width="150" Binding="{Binding Category}">
                         <controls:DataGridTextColumn.Header>
                             <TextBlock Text="Category" Foreground="{StaticResource Green}" FontWeight="Bold"/>
                         </controls:DataGridTextColumn.Header>

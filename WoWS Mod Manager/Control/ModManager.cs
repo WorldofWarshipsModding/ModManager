@@ -46,88 +46,97 @@ namespace WoWS_Mod_Manager.Control
 
             foreach (SelectedMods_ModViewModel modModel in mainPage.viewModel.selectedMods)
             {
-                Mod mod = modModel._Model;
-                /* fetch .wowshome */
-                HttpClient httpClient = new HttpClient();
-                httpClient.DefaultRequestHeaders.Add("User-Agent", "anything that is more than 5 characters because FUCK YOU GITHUB");
-                HttpResponseMessage response = await httpClient.GetAsync(new Uri(mod.home));
-                response.EnsureSuccessStatusCode();
-                string json = await response.Content.ReadAsStringAsync();
-                JSONRootModHome result = JsonConvert.DeserializeObject<JSONRootModHome>(json);
-
-                /* download latest version zip */
-                response = await httpClient.GetAsync(new Uri(result.versions.ElementAt(0).archive));
-                response.EnsureSuccessStatusCode();
-
-                /* extract zip */
-                StorageFile zipfile = await mainPage.modStorage.localFolder.CreateFileAsync(@"\tmp\" + mod.identifier + ".zip", CreationCollisionOption.ReplaceExisting);
-                using (var stream = await zipfile.OpenAsync(FileAccessMode.ReadWrite))
-                using (var ostream = stream.GetOutputStreamAt(0))
+                try
                 {
-                    await response.Content.WriteToStreamAsync(ostream);
+                    Mod mod = modModel._Model;
+                    /* fetch .wowshome */
+                    HttpClient httpClient = new HttpClient();
+                    httpClient.DefaultRequestHeaders.Add("User-Agent", "anything that is more than 5 characters because FUCK YOU GITHUB");
+                    HttpResponseMessage response = await httpClient.GetAsync(new Uri(mod.home));
+                    response.EnsureSuccessStatusCode();
+                    string json = await response.Content.ReadAsStringAsync();
+                    JSONRootModHome result = JsonConvert.DeserializeObject<JSONRootModHome>(json);
 
-                }
-                string ModTmpFolder = (TmpFolder + mod.identifier + @"\");
-                System.IO.Compression.ZipFile.ExtractToDirectory(mainPage.modStorage.localFolder.Path + @"\tmp\" + mod.identifier + ".zip", ModTmpFolder);
-                File.Delete(zipfile.Path);
+                    /* download latest version zip */
+                    response = await httpClient.GetAsync(new Uri(result.versions.ElementAt(0).archive));
+                    response.EnsureSuccessStatusCode();
 
-                /* move files */
-                foreach (string file in Directory.EnumerateFiles(ModTmpFolder, "*.*", SearchOption.AllDirectories))
-                {
-                    string RelativeFile = file.Substring(ModTmpFolder.Length);
-                    string OriginalFile = mainPage.modStorage.localFolder.Path + @"\v" + mainPage.modStorage.versionNumber + @"\wows_resources-" + mainPage.modStorage.versionNumber + @"\" + RelativeFile;
-                    string TargetFile = mainPage.modStorage.localFolder.Path + @"\target\" + RelativeFile;
-                    if (!File.Exists(OriginalFile))
+                    /* extract zip */
+                    StorageFile zipfile = await mainPage.modStorage.localFolder.CreateFileAsync(@"\tmp\" + mod.identifier + ".zip", CreationCollisionOption.ReplaceExisting);
+                    using (var stream = await zipfile.OpenAsync(FileAccessMode.ReadWrite))
+                    using (var ostream = stream.GetOutputStreamAt(0))
                     {
-                        Directory.CreateDirectory(Path.GetDirectoryName(TargetFile));
-                        if (!File.Exists(TargetFile))
-                        {
-                            Debug.WriteLine("[" + mod.identifier + "] copying " + RelativeFile);
-                            File.Copy(file, TargetFile);
-                        }
-                        else
-                        {
-                            Debug.WriteLine("[" + mod.identifier + "] CANNOT MERGE " + RelativeFile);
-                        }
+                        await response.Content.WriteToStreamAsync(ostream);
+
                     }
-                    else
+                    string ModTmpFolder = (TmpFolder + mod.identifier + @"\");
+                    System.IO.Compression.ZipFile.ExtractToDirectory(mainPage.modStorage.localFolder.Path + @"\tmp\" + mod.identifier + ".zip", ModTmpFolder);
+                    File.Delete(zipfile.Path);
+
+                    /* move files */
+                    foreach (string file in Directory.EnumerateFiles(ModTmpFolder, "*.*", SearchOption.AllDirectories))
                     {
-                        if (RelativeFile == @"gui\battle_elements.xml") /* battle_elements.xml has to be merged */
+                        string RelativeFile = file.Substring(ModTmpFolder.Length);
+                        string OriginalFile = mainPage.modStorage.localFolder.Path + @"\v" + mainPage.modStorage.versionNumber + @"\wows_resources-" + mainPage.modStorage.versionNumber + @"\" + RelativeFile;
+                        string TargetFile = mainPage.modStorage.localFolder.Path + @"\target\" + RelativeFile;
+                        if (!File.Exists(OriginalFile))
                         {
                             Directory.CreateDirectory(Path.GetDirectoryName(TargetFile));
                             if (!File.Exists(TargetFile))
                             {
-                                File.Copy(OriginalFile, TargetFile, false);
-                            }
-
-                            using (FileStream targetFile = File.Open(TargetFile, FileMode.Open))
-                            using (FileStream srcFile = File.OpenRead(file))
-                            {
-                                XmlDocument target = new XmlDocument();
-                                target.Load(targetFile);
-                                targetFile.Seek(0, SeekOrigin.Begin);
-                                XmlDocument src = new XmlDocument();
-                                src.Load(srcFile);
-
-                                XmlNode srcnode = src.DocumentElement;
-                                XmlNode dstnode = target.DocumentElement;
-                                MergeBattleElements(srcnode, dstnode);
-                                target.Save(targetFile);
-                            }
-                        }
-                        else
-                        {
-                            if (!File.Exists(TargetFile))
-                            {
-                                File.Copy(file, mainPage.modStorage.localFolder.Path + @"\target\" + RelativeFile);
+                                Debug.WriteLine("[" + mod.identifier + "] copying " + RelativeFile);
+                                File.Copy(file, TargetFile);
                             }
                             else
                             {
                                 Debug.WriteLine("[" + mod.identifier + "] CANNOT MERGE " + RelativeFile);
                             }
                         }
+                        else
+                        {
+                            if (RelativeFile == @"gui\battle_elements.xml") /* battle_elements.xml has to be merged */
+                            {
+                                Directory.CreateDirectory(Path.GetDirectoryName(TargetFile));
+                                if (!File.Exists(TargetFile))
+                                {
+                                    File.Copy(OriginalFile, TargetFile, false);
+                                }
+
+                                using (FileStream targetFile = File.Open(TargetFile, FileMode.Open))
+                                using (FileStream srcFile = File.OpenRead(file))
+                                {
+                                    XmlDocument target = new XmlDocument();
+                                    target.Load(targetFile);
+                                    targetFile.Seek(0, SeekOrigin.Begin);
+                                    XmlDocument src = new XmlDocument();
+                                    src.Load(srcFile);
+
+                                    XmlNode srcnode = src.DocumentElement;
+                                    XmlNode dstnode = target.DocumentElement;
+                                    MergeBattleElements(srcnode, dstnode);
+                                    target.Save(targetFile);
+                                }
+                            }
+                            else
+                            {
+                                if (!File.Exists(TargetFile))
+                                {
+                                    File.Copy(file, mainPage.modStorage.localFolder.Path + @"\target\" + RelativeFile);
+                                }
+                                else
+                                {
+                                    Debug.WriteLine("[" + mod.identifier + "] CANNOT MERGE " + RelativeFile);
+                                }
+                            }
+                        }
                     }
+                } catch(Exception e)
+                {
+                    Debug.WriteLine("failed to merge "+ modModel.Name);
+                    Debug.WriteLine(e.Message); 
+                    Debug.WriteLine(e.StackTrace);
                 }
+                
             }
         }
 

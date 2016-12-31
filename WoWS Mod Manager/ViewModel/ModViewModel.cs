@@ -58,6 +58,28 @@ namespace WoWS_Mod_Manager.ViewModel
             }
         }
 
+        public string Author
+        {
+            get { return _Model.author; }
+            set
+            {
+                if (_Model.author == value) return;
+                _Model.author = value;
+                OnPropertyChanged("Author");
+            }
+        }
+
+        public string Screenshot
+        {
+            get { return _Model.screenshot; }
+            set
+            {
+                if (_Model.screenshot == value) return;
+                _Model.screenshot = value;
+                OnPropertyChanged("Screenshot");
+            }
+        }
+
         override public String ToString()
         {
             return Name;
