@@ -33,5 +33,17 @@ namespace WoWS_Mod_Manager.Xaml
                 OnPropertyChanged("GlobalInterfaceAvailable");
             }
         }
+
+        public Mod TryGetSelected(Mod m)
+        {
+            foreach(SelectedMods_ModViewModel selected in selectedMods)
+            {
+                if (selected._Model.identifier == m.identifier)
+                {
+                    return selected._Model;
+                }
+            }
+            return null;
+        }
     }
 }

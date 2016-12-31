@@ -69,5 +69,10 @@ namespace WoWS_Mod_Manager
             await modManager.Build();
             viewModel.GlobalInterfaceAvailable = true;
         }
+
+        private void RefreshMods_Click(object sender, RoutedEventArgs e)
+        {
+            modStorage.SaveSelectedModData();
+        }
     }
 }

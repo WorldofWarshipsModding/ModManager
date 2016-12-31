@@ -15,7 +15,7 @@
     <Page.TopAppBar>
         <CommandBar>
             <AppBarButton Icon="Play" Label="keks" Click="DeployMods_Click" IsEnabled="{Binding GlobalInterfaceAvailable}"/>
-            <AppBarButton Icon="Refresh" Label="Check for Updates" IsEnabled="{Binding GlobalInterfaceAvailable}"/>
+            <AppBarButton Icon="Refresh" Label="Check for Updates" Click="RefreshMods_Click" IsEnabled="{Binding GlobalInterfaceAvailable}"/>
         </CommandBar>
     </Page.TopAppBar>
     <Grid  Margin="0 0 0 0">

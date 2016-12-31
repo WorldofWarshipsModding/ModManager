@@ -84,8 +84,6 @@ namespace WoWS_Mod_Manager.ViewModel
         {
             return Name;
         }
-
-
     }
 
     public class AvailableMods_ModViewModel : ModViewModel

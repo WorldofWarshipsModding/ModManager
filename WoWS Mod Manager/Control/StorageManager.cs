@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using WoWS_Mod_Manager.Control.Data;
 using System.Collections.ObjectModel;
 using WoWS_Mod_Manager.ViewModel;
+using Newtonsoft.Json;
 
 namespace WoWS_Mod_Manager.Control
 {
@@ -19,6 +20,7 @@ namespace WoWS_Mod_Manager.Control
         public StorageFolder localFolder = ApplicationData.Current.LocalFolder;
         public ObservableCollection<SelectedMods_ModViewModel> selectedMods;
         public const string wowsFolderSetting = "wows_folder";
+        public const string wowsSelectedModsSetting = "wows_selectedmods";
         public Regex wowsVersionRegex = new Regex(@"^[0-9]*\.[0-9]*\.[0-9]*\.[0-9]*");
         public string absoluteWoWSPath = null;
         public string versionNumber = null;
@@ -39,7 +41,46 @@ namespace WoWS_Mod_Manager.Control
             await CheckWoWSLocation();
             await Task.Run(() => CheckWoWSVersion());
             await Task.Run(() => CheckXmlRepository());
+            LoadSelectedModData();
             mainPage.UpdateGlobalInterfaceAvailable();
+        }
+
+        private void LoadSelectedModData()
+        {
+            string SavedMods = (string)storedSettings.Values[wowsSelectedModsSetting];
+            if(SavedMods != null)
+            {
+                try
+                {
+                    JSONRootModList modstorage = JsonConvert.DeserializeObject<JSONRootModList>(SavedMods);
+                    foreach(Mod mod in modstorage.mods)
+                    {
+                        Debug.WriteLine("found mod " + mod.name);
+                        selectedMods.Add(new SelectedMods_ModViewModel(mod));
+                    }
+                } catch(Exception e)
+                {
+                    Debug.WriteLine(e.Message);
+                    Debug.WriteLine(e.StackTrace);
+                }
+            }
+        }
+
+        public void SaveSelectedModData()
+        {
+            try
+            {
+                JSONRootModList storage = new JSONRootModList();
+                foreach (SelectedMods_ModViewModel mod in selectedMods)
+                {
+                    storage.mods.Add(mod._Model);
+                }
+                storedSettings.Values[wowsSelectedModsSetting] = JsonConvert.SerializeObject(storage);
+            } catch(Exception e)
+            {
+                Debug.WriteLine(e.Message);
+                Debug.WriteLine(e.StackTrace);
+            }
         }
 
         private async Task CheckWoWSLocation()
@@ -170,7 +211,6 @@ namespace WoWS_Mod_Manager.Control
             {
                 Debug.Write(e);
             }
-
         }
     }
 }

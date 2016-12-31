@@ -50,7 +50,16 @@ namespace WoWS_Mod_Manager.Control
             JSONRootModList result = JsonConvert.DeserializeObject<JSONRootModList>(json);
             result.mods.ForEach(mod =>
             {
-                AvailableMods_ModViewModel mv = new AvailableMods_ModViewModel(mod);
+                AvailableMods_ModViewModel mv;
+                Mod sel = mainPage.viewModel.TryGetSelected(mod);
+                if(sel!=null)
+                {
+                    mv = new AvailableMods_ModViewModel(sel);
+                    mv.Available = false;
+                } else
+                {
+                    mv = new AvailableMods_ModViewModel(mod);
+                }
                 availableMods.Add(mv);
             });
         }
