@@ -12,6 +12,7 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using WoWS_Mod_Manager.ViewModel;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -23,11 +24,6 @@ namespace WoWS_Mod_Manager.Xaml
         public SelectedModsView()
         {
             this.InitializeComponent();
-        }
-
-        private void ModUninstall_Click(object sender, RoutedEventArgs e)
-        {
-            MainPage.instance.ModUninstall_Click(sender, e);
         }
     }
 }

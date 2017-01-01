@@ -10,45 +10,48 @@
     d:DesignHeight="300"
     d:DesignWidth="400">
 
-    <Grid Background="{StaticResource Base2}" Padding="12 12 12 12">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="10"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <TextBlock TextWrapping="WrapWholeWords" Grid.Row="0" Foreground="{StaticResource Base01}"  Text="Select new mods from the WoWS Mod Archive. If you want to get your mod listed, get in touch! Should a mod be unavailable, please contact the author or maintainer of the mod. The WoWS Mod Archive does not host any mods."/>
-        <Border Grid.Row="2" CornerRadius="2" 
-                    Background="Transparent" 
-                    BorderBrush="Black" 
-                    BorderThickness="2">
-            <controls:DataGrid x:Name="AvailableModsList"
+        <TextBlock TextWrapping="WrapWholeWords" Grid.Row="0" Text="Select new mods from the WoWS Mod Archive. If you want to get your mod listed, get in touch! Should a mod be unavailable, please contact the author or maintainer of the mod. The WoWS Mod Archive does not host any mods."/>
+        <controls:DataGrid Grid.Row="2" x:Name="AvailableModsList"
                            ItemsSource="{Binding availableMods}"
                            DefaultOrderIndex="1">
-                <controls:DataGrid.Columns>
-                    <controls:DataGridTemplatedColumn Width="120" CanSort="False">
-                        <controls:DataGridTemplatedColumn.CellTemplate>
-                            <DataTemplate>
-                                <Button Content="ADD" Height="30" Width="80" Click="ModInstall_Click" Tag="{Binding}" VerticalAlignment="Center" IsEnabled="{Binding Available}"/>
-                            </DataTemplate>
-                        </controls:DataGridTemplatedColumn.CellTemplate>
-                    </controls:DataGridTemplatedColumn>
-                    <controls:DataGridTextColumn Width="4*" Binding="{Binding Name}">
-                        <controls:DataGridTextColumn.Header>
-                            <TextBlock Text="Name" Foreground="{StaticResource Green}" FontWeight="Bold"/>
-                        </controls:DataGridTextColumn.Header>
-                    </controls:DataGridTextColumn>
-                    <controls:DataGridTextColumn Width="*" Binding="{Binding Author}">
-                        <controls:DataGridTextColumn.Header>
-                            <TextBlock Text="Author" Foreground="{StaticResource Green}" FontWeight="Bold"/>
-                        </controls:DataGridTextColumn.Header>
-                    </controls:DataGridTextColumn>
-                    <controls:DataGridTextColumn Width="150" Binding="{Binding Category}">
-                        <controls:DataGridTextColumn.Header>
-                            <TextBlock Text="Category" Foreground="{StaticResource Green}" FontWeight="Bold"/>
-                        </controls:DataGridTextColumn.Header>
-                    </controls:DataGridTextColumn>
-                </controls:DataGrid.Columns>
-            </controls:DataGrid>
-        </Border>
+            <controls:DataGrid.Columns>
+                <controls:DataGridTemplatedColumn Width="84" CanSort="False">
+                    <controls:DataGridTemplatedColumn.CellTemplate>
+                        <DataTemplate>
+                            <local:AvailableModActionButton DataContext="{Binding}"/>
+                        </DataTemplate>
+                    </controls:DataGridTemplatedColumn.CellTemplate>
+                </controls:DataGridTemplatedColumn>
+                <!--<controls:DataGrid.Columns>
+                <controls:DataGridTemplatedColumn Width="120" CanSort="False">
+                    <controls:DataGridTemplatedColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Content="ADD" Height="30" Width="80" Click="ModInstall_ClickAsync" Tag="{Binding}" VerticalAlignment="Center" IsEnabled="{Binding Available}"/>
+                        </DataTemplate>
+                    </controls:DataGridTemplatedColumn.CellTemplate>
+                </controls:DataGridTemplatedColumn>-->
+                <controls:DataGridTextColumn Width="4*" Binding="{Binding Name}">
+                    <controls:DataGridTextColumn.Header>
+                        <TextBlock Text="Name" Foreground="{StaticResource Cyan}" FontWeight="Bold"/>
+                    </controls:DataGridTextColumn.Header>
+                </controls:DataGridTextColumn>
+                <controls:DataGridTextColumn Width="*" Binding="{Binding Author}">
+                    <controls:DataGridTextColumn.Header>
+                        <TextBlock Text="Author" Foreground="{StaticResource Cyan}" FontWeight="Bold"/>
+                    </controls:DataGridTextColumn.Header>
+                </controls:DataGridTextColumn>
+                <controls:DataGridTextColumn Width="150" Binding="{Binding Category}">
+                    <controls:DataGridTextColumn.Header>
+                        <TextBlock Text="Category" Foreground="{StaticResource Cyan}" FontWeight="Bold"/>
+                    </controls:DataGridTextColumn.Header>
+                </controls:DataGridTextColumn>
+            </controls:DataGrid.Columns>
+        </controls:DataGrid>
     </Grid>
 </UserControl>

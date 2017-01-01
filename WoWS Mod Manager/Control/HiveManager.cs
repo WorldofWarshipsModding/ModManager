@@ -18,50 +18,45 @@ namespace WoWS_Mod_Manager.Control
     public class HiveManager
     {
         public string archiveUrl = @"https://raw.githubusercontent.com/WorldofWarshipsModding/wows_modarchive/master/wows.modarchive";
-        public StorageFolder localFolder = ApplicationData.Current.LocalFolder;
-        public ObservableCollection<AvailableMods_ModViewModel> availableMods;
-        public MainPage mainPage;
 
-        public HiveManager(MainPage mp)
+        public HiveManager()
         {
-            mainPage = mp;
-            availableMods = mp.viewModel.availableMods;
-        }
-        public async void Init()
-        {
-            await FetchMods();
+
         }
 
+        /* lazy hive load, seperate task */
         public async Task FetchMods()
         {
-            HttpClient httpClient = new HttpClient();
-            httpClient.DefaultRequestHeaders.Add("User-Agent", "any words that is more than 5 characters");
-            HttpResponseMessage response = await httpClient.GetAsync(new Uri(archiveUrl));
-            response.EnsureSuccessStatusCode();
-            if (File.Exists(localFolder.Path + @"\wowsmods.archive"))
+            try
             {
-                File.Delete(localFolder.Path + @"\wowsmods.archive");
+                HttpClient httpClient = new HttpClient();
+                httpClient.DefaultRequestHeaders.Add("User-Agent", "any words that is more than 5 characters");
+                HttpResponseMessage response = await httpClient.GetAsync(new Uri(archiveUrl));
+                response.EnsureSuccessStatusCode();
+                string json = await response.Content.ReadAsStringAsync();
+                JSONRootModList result = JsonConvert.DeserializeObject<JSONRootModList>(json);
+                result.mods.ForEach(mod =>
+                {
+                    AvailableMods_ModViewModel mv;
+                    Mod sel = App.instance.viewModel.TryGetSelected(mod);
+                    if (sel != null)
+                    {
+                        mv = new AvailableMods_ModViewModel(sel);
+                        mv.Available = false;
+                    }
+                    else
+                    {
+                        mv = new AvailableMods_ModViewModel(mod);
+                    }
+                    App.instance.viewModel.availableMods.Add(mv);
+                });
             }
-            StorageFile wowsarchive = await localFolder.CreateFileAsync("wowsmods.archive");
-            Debug.WriteLine(wowsarchive.Path);
-            var stream = await wowsarchive.OpenAsync(FileAccessMode.ReadWrite);
-            var ostream = stream.GetOutputStreamAt(0);
-            string json = await response.Content.ReadAsStringAsync();
-            JSONRootModList result = JsonConvert.DeserializeObject<JSONRootModList>(json);
-            result.mods.ForEach(mod =>
+            catch (Exception e)
             {
-                AvailableMods_ModViewModel mv;
-                Mod sel = mainPage.viewModel.TryGetSelected(mod);
-                if(sel!=null)
-                {
-                    mv = new AvailableMods_ModViewModel(sel);
-                    mv.Available = false;
-                } else
-                {
-                    mv = new AvailableMods_ModViewModel(mod);
-                }
-                availableMods.Add(mv);
-            });
+                Debug.WriteLine(e.Message);
+                Debug.WriteLine(e.StackTrace);
+            }
+
         }
     }
 }

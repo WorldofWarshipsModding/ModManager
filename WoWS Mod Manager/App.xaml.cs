@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading;
+using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.Foundation;
@@ -14,6 +17,9 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using WoWS_Mod_Manager.Control;
+using WoWS_Mod_Manager.View;
+using WoWS_Mod_Manager.Xaml;
 
 namespace WoWS_Mod_Manager
 {
@@ -22,14 +28,28 @@ namespace WoWS_Mod_Manager
     /// </summary>
     public sealed partial class App : Application
     {
+        public static App instance;
+        public StorageManager storageManager = new StorageManager();
+        public HiveManager hiveManager = new HiveManager();
+        public ModManager modManager = new ModManager();
+        public GlobalViewModel viewModel = new GlobalViewModel();
+
         /// <summary>
         /// Initialisiert das Singletonanwendungsobjekt. Dies ist die erste Zeile von erstelltem Code
         /// und daher das logische Äquivalent von main() bzw. WinMain().
         /// </summary>
         public App()
         {
+            instance = this;
             this.InitializeComponent();
             this.Suspending += OnSuspending;
+            Init();
+        }
+
+        private void Init()
+        {
+            //http://stackoverflow.com/questions/21838651/i-thought-await-continued-on-the-same-thread-as-the-caller-but-it-seems-not-to
+            storageManager.Load(); //TODO move to MainPage?
         }
 
         /// <summary>
@@ -39,6 +59,9 @@ namespace WoWS_Mod_Manager
         /// <param name="e">Details über Startanforderung und -prozess.</param>
         protected override void OnLaunched(LaunchActivatedEventArgs e)
         {
+            Task.Run(() => hiveManager.FetchMods());
+            viewModel.GlobalActionInProgress = false;
+            viewModel.TryEnableGlobalInterface();
 #if DEBUG
             if (System.Diagnostics.Debugger.IsAttached)
             {
@@ -72,7 +95,7 @@ namespace WoWS_Mod_Manager
                     // Wenn der Navigationsstapel nicht wiederhergestellt wird, zur ersten Seite navigieren
                     // und die neue Seite konfigurieren, indem die erforderlichen Informationen als Navigationsparameter
                     // übergeben werden
-                    rootFrame.Navigate(typeof(MainPage), e.Arguments);
+                    rootFrame.Navigate(storageManager.IsMarkedOk() ? typeof(MainPage) : typeof(Options), e.Arguments);
                 }
                 // Sicherstellen, dass das aktuelle Fenster aktiv ist
                 Window.Current.Activate();

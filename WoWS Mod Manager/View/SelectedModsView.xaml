@@ -6,49 +6,152 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:controls="using:MyToolkit.Controls"
+    xmlns:local1="using:WoWS_Mod_Manager.View"
     mc:Ignorable="d"
-    d:DesignHeight="300"
-    d:DesignWidth="400">
-    
-    <Grid Background="{StaticResource Base2}" Padding="12 12 12 12">
+    d:DesignHeight="800"
+    d:DesignWidth="600">
+
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="10"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <TextBlock TextWrapping="WrapWholeWords" Grid.Row="0" Foreground="{StaticResource Base01}"  Text="Select new mods from the WoWS Mod Archive. If you want to get your mod listed, get in touch! Should a mod be unavailable, please contact the author or maintainer of the mod. The WoWS Mod Archive does not host any mods."/>
-        <Border Grid.Row="2" CornerRadius="2" 
-                    Background="Transparent" 
-                    BorderBrush="Black" 
-                    BorderThickness="2">
-            <controls:DataGrid x:Name="SelecredModsList"
+        <TextBlock TextWrapping="WrapWholeWords" Grid.Row="0" Text="test"/>
+        <controls:DataGrid x:Name="SelectedModsList" Grid.Row="2"
                            ItemsSource="{Binding selectedMods}"
                            DefaultOrderIndex="1">
-                <controls:DataGrid.Columns>
-                    <controls:DataGridTemplatedColumn Width="120" CanSort="False">
-                        <controls:DataGridTemplatedColumn.CellTemplate>
-                            <DataTemplate>
-                                <Button Content="REMOVE" Height="30" Width="80" Click="ModUninstall_Click" Tag="{Binding}" VerticalAlignment="Center"/>
-                            </DataTemplate>
-                        </controls:DataGridTemplatedColumn.CellTemplate>
-                    </controls:DataGridTemplatedColumn>
-                    <controls:DataGridTextColumn Width="4*" Binding="{Binding Name}">
-                        <controls:DataGridTextColumn.Header>
-                            <TextBlock Text="Name" Foreground="{StaticResource Green}" FontWeight="Bold"/>
-                        </controls:DataGridTextColumn.Header>
-                    </controls:DataGridTextColumn>
-                    <controls:DataGridTextColumn Width="*" Binding="{Binding Author}">
-                        <controls:DataGridTextColumn.Header>
-                            <TextBlock Text="Author" Foreground="{StaticResource Green}" FontWeight="Bold"/>
-                        </controls:DataGridTextColumn.Header>
-                    </controls:DataGridTextColumn>
-                    <controls:DataGridTextColumn Width="150" Binding="{Binding LatestVersion}">
-                        <controls:DataGridTextColumn.Header>
-                            <TextBlock Text="LatestVersion" Foreground="{StaticResource Green}" FontWeight="Bold"/>
-                        </controls:DataGridTextColumn.Header>
-                    </controls:DataGridTextColumn>
-                </controls:DataGrid.Columns>
-            </controls:DataGrid>
-        </Border>
+            <controls:DataGrid.Columns>
+                <controls:DataGridTemplatedColumn Width="84" CanSort="False">
+                    <controls:DataGridTemplatedColumn.CellTemplate>
+                        <DataTemplate>
+                            <local1:SelectedModActionButton DataContext="{Binding}"/>
+                        </DataTemplate>
+                    </controls:DataGridTemplatedColumn.CellTemplate>
+                </controls:DataGridTemplatedColumn>
+                <controls:DataGridTemplatedColumn Width="4*" CanSort="False">
+                    <controls:DataGridTemplatedColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock Name="ModName" Style="{StaticResource Normal}" Text="{Binding Name}" Visibility="Visible" Width="Auto"/>
+                                <TextBlock Name="ModErrorMessage" Text="{Binding ErrorText}" Visibility="{Binding ErrorTextVisibility}" Foreground="{StaticResource Red}" FontWeight="Bold"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </controls:DataGridTemplatedColumn.CellTemplate>
+                    <controls:DataGridTemplatedColumn.Header>
+                        <TextBlock Text="Name" Foreground="{StaticResource Cyan}" FontWeight="Bold"/>
+                    </controls:DataGridTemplatedColumn.Header>
+                </controls:DataGridTemplatedColumn>
+                <controls:DataGridTextColumn Width="*" Binding="{Binding Author}">
+                    <controls:DataGridTextColumn.Header>
+                        <TextBlock Text="Author" Foreground="{StaticResource Cyan}" FontWeight="Bold"/>
+                    </controls:DataGridTextColumn.Header>
+                </controls:DataGridTextColumn>
+                <controls:DataGridTextColumn Width="150" Binding="{Binding Version}">
+                    <controls:DataGridTextColumn.Header>
+                        <TextBlock Text="Version" Foreground="{StaticResource Cyan}" FontWeight="Bold"/>
+                    </controls:DataGridTextColumn.Header>
+                </controls:DataGridTextColumn>
+                <controls:DataGridTemplatedColumn Width="80" CanSort="False">
+                    <controls:DataGridTemplatedColumn.CellTemplate>
+                        <DataTemplate>
+                            <local1:DeleteButton DataContext="{Binding}"/>
+                        </DataTemplate>
+                    </controls:DataGridTemplatedColumn.CellTemplate>
+                </controls:DataGridTemplatedColumn>
+            </controls:DataGrid.Columns>
+            <controls:DataGrid.Resources>
+                <SolidColorBrush x:Key="SelectedBrush" Color="Orange" />
+            </controls:DataGrid.Resources>
+            <!-- <controls:DataGrid.RowStyle>
+                <Style TargetType="ListBoxItem">
+                   
+                </Style>
+            </controls:DataGrid.RowStyle>
+            <Setter Property="AccentBrush" Value=""/>-->
+            <controls:DataGrid.RowStyle>
+                <Style TargetType="ListBoxItem">
+                    <Setter Property="Background" Value="Transparent"/>
+                    <Setter Property="TabNavigation" Value="Local"/>
+                    <Setter Property="Padding" Value="0"/>
+                    <Setter Property="HorizontalContentAlignment" Value="Left"/>
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="ListBoxItem">
+                                <Border x:Name="LayoutRoot">
+                                    <VisualStateManager.VisualStateGroups>
+                                        <VisualStateGroup x:Name="SelectionStates">
+                                            <VisualState x:Name="Unselected">
+                                                <Storyboard>
+                                                    <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Foreground" Storyboard.TargetName="ContentPresenter">
+                                                        <DiscreteObjectKeyFrame KeyTime="0" Value="#7FFFFFFF"/>
+                                                    </ObjectAnimationUsingKeyFrames>
+                                                </Storyboard>
+                                            </VisualState>
+                                            <VisualState x:Name="Selected">
+                                                <Storyboard>
+                                                    <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Foreground" Storyboard.TargetName="ContentPresenter">
+                                                        <DiscreteObjectKeyFrame KeyTime="0" Value="#FFFFFFFF"/>
+                                                    </ObjectAnimationUsingKeyFrames>
+                                                </Storyboard>
+                                            </VisualState>
+                                            <VisualState x:Name="SelectedUnfocused">
+                                                <Storyboard>
+                                                    <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Foreground" Storyboard.TargetName="ContentPresenter">
+                                                        <DiscreteObjectKeyFrame KeyTime="0" Value="#FFFFFFFF"/>
+                                                    </ObjectAnimationUsingKeyFrames>
+                                                </Storyboard>
+                                            </VisualState>
+                                            <VisualState x:Name="SelectedDisabled">
+                                                <Storyboard>
+                                                    <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Foreground" Storyboard.TargetName="ContentPresenter">
+                                                        <DiscreteObjectKeyFrame KeyTime="0" Value="#FFFFFFFF"/>
+                                                    </ObjectAnimationUsingKeyFrames>
+                                                </Storyboard>
+                                            </VisualState>
+                                            <VisualState x:Name="SelectedPointerOver">
+                                                <Storyboard>
+                                                    <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Foreground" Storyboard.TargetName="ContentPresenter">
+                                                        <DiscreteObjectKeyFrame KeyTime="0" Value="#FFFFFFFF"/>
+                                                    </ObjectAnimationUsingKeyFrames>
+                                                </Storyboard>
+                                            </VisualState>
+                                            <VisualState x:Name="SelectedPressed">
+                                                <Storyboard>
+                                                    <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Foreground" Storyboard.TargetName="ContentPresenter">
+                                                        <DiscreteObjectKeyFrame KeyTime="0" Value="#fFFFFFFF"/>
+                                                    </ObjectAnimationUsingKeyFrames>
+                                                </Storyboard>
+                                            </VisualState>
+                                        </VisualStateGroup>
+                                        <VisualStateGroup x:Name="FocusStates">
+                                            <VisualState x:Name="Focused">
+                                                <Storyboard>
+                                                    <DoubleAnimation Duration="0" To="1" Storyboard.TargetProperty="Opacity" Storyboard.TargetName="FocusVisualWhite"/>
+                                                    <DoubleAnimation Duration="0" To="1" Storyboard.TargetProperty="Opacity" Storyboard.TargetName="FocusVisualBlack"/>
+                                                </Storyboard>
+                                            </VisualState>
+                                            <VisualState x:Name="Unfocused"/>
+                                            <VisualState x:Name="PointerFocused"/>
+                                        </VisualStateGroup>
+                                    </VisualStateManager.VisualStateGroups>
+
+                                    <Grid x:Name="InnerGrid" Background="Transparent">
+                                        <Rectangle x:Name="PressedBackground" Opacity="0"/>
+                                        <ContentPresenter x:Name="ContentPresenter" ContentTemplate="{TemplateBinding ContentTemplate}" 
+                                                                          ContentTransitions="{TemplateBinding ContentTransitions}" 
+                                                                          Content="{TemplateBinding Content}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                                          Margin="{TemplateBinding Padding}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+
+                                        <Rectangle x:Name="FocusVisualWhite" Opacity="0" StrokeDashOffset=".5" StrokeEndLineCap="Square" StrokeDashArray="1,1"/>
+                                        <Rectangle x:Name="FocusVisualBlack" Opacity="0" StrokeDashOffset="1.5" StrokeEndLineCap="Square" StrokeDashArray="1,1"/>
+                                    </Grid>
+                                </Border>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </controls:DataGrid.RowStyle>
+        </controls:DataGrid>
     </Grid>
 </UserControl>

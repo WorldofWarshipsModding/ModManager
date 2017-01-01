@@ -1,0 +1,32 @@
+﻿<UserControl
+    x:Class="WoWS_Mod_Manager.View.DeleteButton"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:WoWS_Mod_Manager.View"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    d:DesignHeight="30"
+    d:DesignWidth="30">
+
+    <!--<Button Background="Transparent" Height="60" Width="60">
+        <Image Width="Auto" Height="Auto" Source="/Assets/Icons/delete_update_30.png"/>
+    </Button>-->
+    <Button Height="30" Width="30" Click="DeleteButton_Click">
+        <Button.Template>
+            <ControlTemplate>
+                <Image Name="RootImage" Source="/Assets/Icons/delete_update_30.png">
+                    <!--<VisualStateManager.VisualStateGroups>
+                        <VisualStateGroup x:Name="CommonStates">
+                            <VisualState x:Name="Normal">
+                                <Storyboard>
+                                    <PointerUpThemeAnimation Storyboard.TargetName="RootImage"/>
+                                </Storyboard>
+                            </VisualState>
+                        </VisualStateGroup>
+                    </VisualStateManager.VisualStateGroups>-->
+                </Image>
+            </ControlTemplate>
+        </Button.Template>
+    </Button>
+</UserControl>

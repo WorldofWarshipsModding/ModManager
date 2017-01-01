@@ -12,76 +12,65 @@ using Windows.Storage;
 using WoWS_Mod_Manager.Control.Data;
 using WoWS_Mod_Manager.ViewModel;
 using System.Threading;
+using Windows.Storage.Streams;
+using WoWS_Mod_Manager.Xaml;
+using Windows.UI.Xaml;
 
 namespace WoWS_Mod_Manager.Control
 {
     public class ModManager
     {
-        string TmpFolder = ApplicationData.Current.LocalFolder.Path + @"\tmp\";
-        string TargetFolder = ApplicationData.Current.LocalFolder.Path + @"\target\";
-        private MainPage mainPage;
-        public ModManager(MainPage mainPage)
+        String TmpFolder = ApplicationData.Current.LocalFolder.Path + @"\tmp\";
+        String TargetFolder = ApplicationData.Current.LocalFolder.Path + @"\target\";
+        String ModsFolder = ApplicationData.Current.LocalFolder.Path + @"\mods\";
+        public ModManager()
         {
-            this.mainPage = mainPage;
+
         }
 
-        public async Task Build()
+        public void Push()
         {
             try
             {
-                await Merge();
-                await Task.Run(()=>Deploy());
+                BuildResult result = new BuildResult();
+                Merge(result).Wait();
+                if (result.BuildSuccessful)
+                {
+                    Deploy();
+                }
+                //TODO feedback
             }
             catch (Exception e)
             {
-                Debug.Write(e.StackTrace);
+                Debug.WriteLine(e.Message);
+                Debug.WriteLine(e.StackTrace);
             }
+
         }
 
-        public async Task Merge()
-        {
-            //http://stackoverflow.com/questions/14435520/why-use-httpclient-for-synchronous-connection DEADLOCK
-            await ApplicationData.Current.LocalFolder.CreateFolderAsync("tmp", CreationCollisionOption.ReplaceExisting);
-            await ApplicationData.Current.LocalFolder.CreateFolderAsync("target", CreationCollisionOption.ReplaceExisting);
 
-            foreach (SelectedMods_ModViewModel modModel in mainPage.viewModel.selectedMods)
+        private async Task Merge(BuildResult buildResult)
+        {
+            if (Directory.Exists(TmpFolder)) Directory.Delete(TmpFolder, true);
+            if (Directory.Exists(TargetFolder)) Directory.Delete(TargetFolder, true);
+            Directory.CreateDirectory(TmpFolder);
+            Directory.CreateDirectory(TargetFolder);
+            await App.instance.storageManager.CheckXmlRepository();
+            foreach (SelectedMods_ModViewModel modModel in App.instance.viewModel.selectedMods)
             {
                 try
                 {
                     Mod mod = modModel._Model;
-                    /* fetch .wowshome */
-                    HttpClient httpClient = new HttpClient();
-                    httpClient.DefaultRequestHeaders.Add("User-Agent", "anything that is more than 5 characters because FUCK YOU GITHUB");
-                    HttpResponseMessage response = await httpClient.GetAsync(new Uri(mod.home));
-                    response.EnsureSuccessStatusCode();
-                    string json = await response.Content.ReadAsStringAsync();
-                    JSONRootModHome result = JsonConvert.DeserializeObject<JSONRootModHome>(json);
-
-                    /* update ModData */
-                    modModel.LatestVersion = result.versions.ElementAt(0).version;
-
-                    /* download latest version zip */
-                    response = await httpClient.GetAsync(new Uri(result.versions.ElementAt(0).archive));
-                    response.EnsureSuccessStatusCode();
-
-                    /* extract zip */
-                    StorageFile zipfile = await mainPage.modStorage.localFolder.CreateFileAsync(@"\tmp\" + mod.identifier + ".zip", CreationCollisionOption.ReplaceExisting);
-                    using (var stream = await zipfile.OpenAsync(FileAccessMode.ReadWrite))
-                    using (var ostream = stream.GetOutputStreamAt(0))
-                    {
-                        await response.Content.WriteToStreamAsync(ostream);
-
-                    }
-                    string ModTmpFolder = (TmpFolder + mod.identifier + @"\");
-                    System.IO.Compression.ZipFile.ExtractToDirectory(mainPage.modStorage.localFolder.Path + @"\tmp\" + mod.identifier + ".zip", ModTmpFolder);
-                    File.Delete(zipfile.Path);
+                    String ModVersionFolder = ModsFolder + mod.identifier + @"\" + modModel.Version;
+                    Debug.WriteLine("Merging Mod " + ModVersionFolder);
 
                     /* move files */
-                    foreach (string file in Directory.EnumerateFiles(ModTmpFolder, "*.*", SearchOption.AllDirectories))
+                    foreach (string file in Directory.EnumerateFiles(ModVersionFolder, "*.*", SearchOption.AllDirectories))
                     {
-                        string RelativeFile = file.Substring(ModTmpFolder.Length);
-                        string OriginalFile = mainPage.modStorage.localFolder.Path + @"\v" + mainPage.modStorage.versionNumber + @"\wows_resources-" + mainPage.modStorage.versionNumber + @"\" + RelativeFile;
-                        string TargetFile = mainPage.modStorage.localFolder.Path + @"\target\" + RelativeFile;
+                        Debug.WriteLine(String.Format("handling file {0}", file));
+                        string RelativeFile = file.Substring(ModVersionFolder.Length);
+                        string OriginalFile = ApplicationData.Current.LocalFolder.Path + @"\v" + App.instance.storageManager.versionNumber + @"\wows_resources-" + App.instance.storageManager.versionNumber + @"\" + RelativeFile;
+                        string TargetFile = TargetFolder + RelativeFile;
                         if (!File.Exists(OriginalFile))
                         {
                             Directory.CreateDirectory(Path.GetDirectoryName(TargetFile));
@@ -97,8 +86,10 @@ namespace WoWS_Mod_Manager.Control
                         }
                         else
                         {
-                            if (RelativeFile == @"gui\battle_elements.xml") /* battle_elements.xml has to be merged */
+                            Debug.WriteLine("Handling " + RelativeFile);
+                            if (RelativeFile == @"\gui\battle_elements.xml" || RelativeFile == @"gui\battle_elements.xml") /* battle_elements.xml has to be merged */
                             {
+                                Debug.WriteLine("[" + mod.identifier + "] merging " + RelativeFile);
                                 Directory.CreateDirectory(Path.GetDirectoryName(TargetFile));
                                 if (!File.Exists(TargetFile))
                                 {
@@ -124,22 +115,23 @@ namespace WoWS_Mod_Manager.Control
                             {
                                 if (!File.Exists(TargetFile))
                                 {
-                                    File.Copy(file, mainPage.modStorage.localFolder.Path + @"\target\" + RelativeFile);
+                                    Debug.WriteLine("[" + mod.identifier + "] unable to merge, copying " + RelativeFile);
+                                    File.Copy(file, ApplicationData.Current.LocalFolder.Path + @"\target\" + RelativeFile);
                                 }
                                 else
                                 {
-                                    Debug.WriteLine("[" + mod.identifier + "] CANNOT MERGE " + RelativeFile);
+                                    Debug.WriteLine("[" + mod.identifier + "] unable to merge, is in confict " + RelativeFile);
                                 }
                             }
                         }
                     }
-                } catch(Exception e)
+                }
+                catch (Exception e)
                 {
-                    Debug.WriteLine("failed to merge "+ modModel.Name);
-                    Debug.WriteLine(e.Message); 
+                    Debug.WriteLine("failed to merge " + modModel.Name);
+                    Debug.WriteLine(e.Message);
                     Debug.WriteLine(e.StackTrace);
                 }
-                
             }
         }
 
@@ -173,7 +165,7 @@ namespace WoWS_Mod_Manager.Control
                     }
                     if (semiequal != null)
                     {
-                        Debug.WriteLine(Fancify(srcchild) + " found " + Fancify(semiequal));
+                        //Debug.WriteLine(Fancify(srcchild) + " found " + Fancify(semiequal));
                         if (ShouldReplace(srcchild, semiequal))
                         {
                             dst.RemoveChild(semiequal);
@@ -186,7 +178,7 @@ namespace WoWS_Mod_Manager.Control
                     }
                     else
                     {
-                        Debug.WriteLine(Fancify(srcchild) + " found no semiequal");
+                        //Debug.WriteLine(Fancify(srcchild) + " found no semiequal");
                         dst.PrependChild(dst.OwnerDocument.ImportNode(srcchild, true));
                     }
                 }
@@ -230,7 +222,6 @@ namespace WoWS_Mod_Manager.Control
             return false;
         }
 
-
         private bool ShouldReplace(XmlNode src, XmlNode dst)
         {
             foreach (XmlAttribute srcattr in src.Attributes)
@@ -247,17 +238,119 @@ namespace WoWS_Mod_Manager.Control
             return false;
         }
 
-        private void Deploy()
+        private bool Deploy()
         {
-            string res_mods = mainPage.modStorage.absoluteWoWSPath + @"\res_mods\";
-            foreach (string file in Directory.EnumerateFiles(TargetFolder, "*.*", SearchOption.AllDirectories))
+            try
             {
-                string RelativeFile = file.Substring(TargetFolder.Length);
-                string DeployPath = res_mods + @"\" + mainPage.modStorage.versionNumber + @"\" + RelativeFile;
-                Directory.CreateDirectory(Path.GetDirectoryName(DeployPath));
-                Debug.WriteLine(String.Format("{0} {1}", TargetFolder+RelativeFile, DeployPath));
-                File.Copy(TargetFolder + RelativeFile, DeployPath, true);
+                string res_mods = App.instance.viewModel.WoWSFolder + @"\res_mods\";
+                Debug.WriteLine("[ModManager] deploying target folder");
+                foreach (string file in Directory.EnumerateFiles(TargetFolder, "*.*", SearchOption.AllDirectories))
+                {
+                    string RelativeFile = file.Substring(TargetFolder.Length);
+                    string DeployPath = res_mods + @"\" + App.instance.storageManager.versionNumber + @"\" + RelativeFile;
+                    Debug.WriteLine("[ModManager] deploying " + DeployPath);
+                    Directory.CreateDirectory(Path.GetDirectoryName(DeployPath));
+                    File.Copy(TargetFolder + RelativeFile, DeployPath, true);
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.Message);
+                Debug.WriteLine(e.StackTrace);
+            }
+            return false;
+        }
+
+        /* checks home, "verifies" local version */
+        public async Task<JSONRootModHome> FetchModHome(Mod mod)
+        {
+            try
+            {
+                HttpClient httpClient = new HttpClient();
+                httpClient.DefaultRequestHeaders.Add("User-Agent", "anything that is more than 5 characters because FUCK YOU GITHUB");
+                HttpResponseMessage response = await httpClient.GetAsync(new Uri(mod.home));
+                response.EnsureSuccessStatusCode();
+                string json = await response.Content.ReadAsStringAsync();
+                JSONRootModHome result = JsonConvert.DeserializeObject<JSONRootModHome>(json);
+                return result;
+            } catch(Exception e)
+            {
+                Debug.WriteLine(e.Message);
+                Debug.WriteLine(e.StackTrace);
+            }
+            return null;
+        }
+
+        public async Task HandleDownloadModActionAsync(Mod mod, ModDownloadProgress progress, String version)
+        {
+            try
+            {
+                await mod.selectedListViewModel.SetImagePath("/Assets/Icons/update_loading_60.png");
+                progress.cancellationToken.Token.ThrowIfCancellationRequested();
+
+                /* fetch .wowshome */
+                HttpClient httpClient = new HttpClient();
+                httpClient.DefaultRequestHeaders.Add("User-Agent", "anything that is more than 5 characters because FUCK YOU GITHUB");
+                HttpResponseMessage response = await httpClient.GetAsync(new Uri(mod.home)).AsTask(progress.cancellationToken.Token);
+                progress.cancellationToken.Token.ThrowIfCancellationRequested();
+                response.EnsureSuccessStatusCode();
+                string json = await response.Content.ReadAsStringAsync();
+                JSONRootModHome result = JsonConvert.DeserializeObject<JSONRootModHome>(json);
+                progress.cancellationToken.Token.ThrowIfCancellationRequested();
+
+                ModRelease release = result.versions.ElementAt(0);
+                await mod.selectedListViewModel.SetVersion(release.version);
+                String ModVersionFolder = ModsFolder + mod.identifier + @"\" + release.version;
+                if (Directory.Exists(ModVersionFolder)) Directory.Delete(ModVersionFolder, true);
+                Directory.CreateDirectory(ModVersionFolder);
+
+                /* download latest version zip */
+                response = await httpClient.GetAsync(new Uri(release.archive)).AsTask(progress.cancellationToken.Token);
+                response.EnsureSuccessStatusCode();
+                progress.cancellationToken.Token.ThrowIfCancellationRequested();
+
+                string zipfile = ModVersionFolder + mod.identifier + release.version + ".zip";
+                IOutputStream zipstream = File.Create(zipfile).AsOutputStream();
+                await response.Content.WriteToStreamAsync(zipstream);
+                zipstream.Dispose();
+                progress.cancellationToken.Token.ThrowIfCancellationRequested();
+
+                /* extract zip */
+                System.IO.Compression.ZipFile.ExtractToDirectory(ModVersionFolder + mod.identifier + release.version + ".zip", ModVersionFolder);
+                File.Delete(zipfile);
+
+                await mod.selectedListViewModel.SetImagePath("/Assets/Icons/deactivated_60.png");
+                progress.success = true;
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.Message);
+                Debug.WriteLine(e.StackTrace);
+                if (Directory.Exists(ModsFolder + mod.identifier)) Directory.Delete(ModsFolder + mod.identifier + @"\" + version, true);
+                await mod.selectedListViewModel.SetError(e.Message.Substring(0, e.Message.IndexOf(Environment.NewLine)));
+                await mod.selectedListViewModel.SetImagePath("/Assets/Icons/update_fail_60.png");
+            }
+            finally
+            {
+                await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+                {
+                    mod.selectedListViewModel.Progress = null;
+                    App.instance.viewModel.PendingActions.Remove(progress);
+                    App.instance.viewModel.TryEnableGlobalInterface();
+                });
             }
         }
+    }
+
+    public class BuildResult
+    {
+        public bool BuildSuccessful = true;
+        public bool DeploymentSuccessful = true;
+        public List<ModResult> Failures = new List<ModResult>();
+    }
+
+    public class ModResult
+    {
+
     }
 }

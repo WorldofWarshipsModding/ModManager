@@ -7,15 +7,16 @@
     xmlns:view="using:WoWS_Mod_Manager.View"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d"
-    Background="{StaticResource Base3}">
+    mc:Ignorable="d">
     <Page.Resources>
     </Page.Resources>
 
     <Page.TopAppBar>
         <CommandBar>
             <AppBarButton Icon="Play" Label="keks" Click="DeployMods_Click" IsEnabled="{Binding GlobalInterfaceAvailable}"/>
-            <AppBarButton Icon="Refresh" Label="Check for Updates" Click="RefreshMods_Click" IsEnabled="{Binding GlobalInterfaceAvailable}"/>
+            <AppBarButton Icon="Save" Click="SaveMods_Click" IsEnabled="{Binding GlobalInterfaceAvailable}"/>
+            <!-- <AppBarButton Icon="Refresh" Label="Check for Updates" IsEnabled="{Binding GlobalInterfaceAvailable}"/> -->
+            <AppBarButton Icon="Setting" Label="Settings" Click="Settings_Click" IsEnabled="{Binding GlobalInterfaceAvailable}"/>
         </CommandBar>
     </Page.TopAppBar>
     <Grid  Margin="0 0 0 0">
@@ -25,13 +26,13 @@
         <Pivot Grid.Row="0"  x:Name="rootPivot">
             <PivotItem Margin="0 0 0 0" Padding="0 0 0 0">
                 <PivotItem.Header>
-                    <local:TabHeader Header="Selected Mods" Foreground="{StaticResource Yellow}" FontWeight="Bold"/>
+                    <local:TabHeader Header="Selected Mods" Foreground="{StaticResource Cyan}" FontWeight="Bold"/>
                 </PivotItem.Header>
                 <xaml:SelectedModsView x:Name="SelectedModsView"/>
             </PivotItem>
             <PivotItem Margin="0 0 0 0">
                 <PivotItem.Header>
-                    <local:TabHeader Header="Available Mods" Foreground="{StaticResource Yellow}" FontWeight="Bold"/>
+                    <local:TabHeader Header="Available Mods" Foreground="{StaticResource Cyan}" FontWeight="Bold"/>
                 </PivotItem.Header>
                 <view:AvailableModsView x:Name="AvailableModsView"/>
             </PivotItem>

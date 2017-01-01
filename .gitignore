@@ -12,6 +12,7 @@ _pkginfo.txt
 *.suo
 *.user
 *.sln.docstates
+*.lock.json
 
 # Build results
 

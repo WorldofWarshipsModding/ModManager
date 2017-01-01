@@ -102,15 +102,28 @@
     <Compile Include="Control\Data\Mod.cs" />
     <Compile Include="Control\HiveManager.cs" />
     <Compile Include="Control\ModManager.cs" />
+    <Compile Include="Control\Util.cs" />
     <Compile Include="ViewModel\ModViewModel.cs" />
+    <Compile Include="View\AvailableModActionButton.xaml.cs">
+      <DependentUpon>AvailableModActionButton.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\SelectedModActionButton.xaml.cs">
+      <DependentUpon>SelectedModActionButton.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\AvailableModsView.xaml.cs">
       <DependentUpon>AvailableModsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\DeleteButton.xaml.cs">
+      <DependentUpon>DeleteButton.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Control\StorageManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="View\Options.xaml.cs">
+      <DependentUpon>Options.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\SelectedModsView.xaml.cs">
       <DependentUpon>SelectedModsView.xaml</DependentUpon>
     </Compile>
@@ -128,6 +141,16 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Package.StoreAssociation.xml" />
+    <Content Include="Assets\Icons\deactivated_60.png" />
+    <Content Include="Assets\Icons\delete_update_30.png" />
+    <Content Include="Assets\Icons\Icon_DL_New_60.png" />
+    <Content Include="Assets\Icons\install_selected_mod_30.png" />
+    <Content Include="Assets\Icons\install_selected_mod_grey_30.png" />
+    <Content Include="Assets\Icons\refresh.png" />
+    <Content Include="Assets\Icons\refresh_green_30.png" />
+    <Content Include="Assets\Icons\update_fail_60.png" />
+    <Content Include="Assets\Icons\update_loading_60.png" />
+    <Content Include="Assets\Icons\update_terminated_60.png" />
     <Content Include="Assets\StoreLogo.png" />
     <Content Include="Properties\Default.rd.xml" />
     <Content Include="Assets\LockScreenLogo.scale-200.png" />
@@ -142,13 +165,29 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="View\AvailableModActionButton.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\SelectedModActionButton.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\AvailableModsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\DeleteButton.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\MainPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\Options.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\SelectedModsView.xaml">
       <SubType>Designer</SubType>
@@ -159,6 +198,7 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>

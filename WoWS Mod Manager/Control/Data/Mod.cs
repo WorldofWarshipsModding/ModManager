@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WoWS_Mod_Manager.ViewModel;
+using WoWS_Mod_Manager.Xaml;
 
 namespace WoWS_Mod_Manager.Control.Data
 {
@@ -29,6 +30,7 @@ namespace WoWS_Mod_Manager.Control.Data
         public string website { get; set; }
         public string author { get; set; }
         public string screenshot { get; set; }
+
         override public string ToString()
         {
             return name + " ("+identifier+")";

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
@@ -12,6 +13,8 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using WoWS_Mod_Manager.ViewModel;
+using WoWS_Mod_Manager.Xaml;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -22,11 +25,6 @@ namespace WoWS_Mod_Manager.View
         public AvailableModsView()
         {
             this.InitializeComponent();
-        }
-
-        private void ModInstall_Click(object sender, RoutedEventArgs e)
-        {
-            MainPage.instance.ModInstall_Click(sender, e);
         }
     }
 }
