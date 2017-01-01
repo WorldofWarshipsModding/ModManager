@@ -25,7 +25,7 @@ namespace WoWS_Mod_Manager.Xaml
             this.InitializeComponent();
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void ModUninstall_Click(object sender, RoutedEventArgs e)
         {
             MainPage.instance.ModUninstall_Click(sender, e);
         }

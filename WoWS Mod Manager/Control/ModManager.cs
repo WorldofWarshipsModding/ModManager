@@ -57,6 +57,9 @@ namespace WoWS_Mod_Manager.Control
                     string json = await response.Content.ReadAsStringAsync();
                     JSONRootModHome result = JsonConvert.DeserializeObject<JSONRootModHome>(json);
 
+                    /* update ModData */
+                    modModel.LatestVersion = result.versions.ElementAt(0).version;
+
                     /* download latest version zip */
                     response = await httpClient.GetAsync(new Uri(result.versions.ElementAt(0).archive));
                     response.EnsureSuccessStatusCode();

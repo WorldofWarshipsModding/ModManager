@@ -112,5 +112,17 @@ namespace WoWS_Mod_Manager.ViewModel
         {
             _Model.selectedListViewModel = this;
         }
+
+        private string _LatestVersion;
+        public string LatestVersion
+        {
+            get { return _LatestVersion; }
+            set
+            {
+                if (_LatestVersion == value) return;
+                _LatestVersion = value;
+                OnPropertyChanged("LatestVersion");
+            }
+        }
     }
 }

@@ -18,14 +18,8 @@ namespace WoWS_Mod_Manager.Control.Data
         [JsonIgnore]
         public SelectedMods_ModViewModel selectedListViewModel;
 
-        public bool ShouldSerializeLocalVersion()
-        {
-            Debug.WriteLine("ShouldSerializelocalVersion");
-            return readlocal;
-        }
-        public string LocalVersion { get; set; }
-
-
+        //TODO dont read this from remote!
+        public string localversion { get; set; }
         public string identifier { get; set; }
         public string name { get; set; }
         public string license { get; set; }
@@ -41,8 +35,9 @@ namespace WoWS_Mod_Manager.Control.Data
         }
     }
 
-    public class ModData
+    public class ModRelease
     {
+
         public String version { get; set; }
         public String minWoWSVersion { get; set; }
         public string archive { get; set; }
@@ -55,6 +50,6 @@ namespace WoWS_Mod_Manager.Control.Data
     public class JSONRootModHome
     {
         public string screenshot { get; set; }
-        public List<ModData> versions { get; set; }
+        public List<ModRelease> versions { get; set; }
     }
 }
